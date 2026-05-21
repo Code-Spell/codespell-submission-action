@@ -6,32 +6,29 @@ const glob = require('glob');
 
 async function run() {
     try {
-        const apiUrl = core.getInput('api-url');
-        const apiToken = core.getInput('api-token');
         const contentId = core.getInput('content-id');
         const language = core.getInput('language');
+        const userId = core.getInput('user-id');
+        const authToken = core.getInput('auth-token');
+        const apiUrl = core.getInput('api-url');
+        
         const sourcePath = core.getInput('source-path');
+        const excludedPaths = core.getInput('exclude-paths').split(',').map(p => p.trim());
 
         const files = glob.sync(`${sourcePath}/**/*.*`, {
             nodir: true,
-            ignore: [
-                '**/node_modules/**',
-                '**/.git/**',
-                '**/dist/**',
-                '**/build/**'
-            ]
+            ignore: excludedPaths.map(p => `${p}/**`)
         });
 
         const codeSources = files.map(file => {
             const content = fs.readFileSync(file);
-
             const parsed = path.parse(file);
 
             return {
                 filename: parsed.name,
                 extension: parsed.ext.replace('.', ''),
                 path: parsed.dir,
-                code: content.toString('base64')
+                code: btoa(content.toString('utf-8'))
             };
         });
 
@@ -46,7 +43,7 @@ async function run() {
             payload,
             {
                 headers: {
-                    Authorization: `Bearer ${apiToken}`,
+                    Authorization: `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
                 }
             }
@@ -57,7 +54,6 @@ async function run() {
         if (response.data.id) {
             core.setOutput('submission-id', response.data.id);
         }
-
     } catch (error) {
         core.setFailed(error.message);
     }
