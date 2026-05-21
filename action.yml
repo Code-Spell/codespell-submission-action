@@ -1,0 +1,37 @@
+name: CodeSpell Submission Action
+description: Create a new CodeSpell submission from the repository contents on push.
+author: CodeSpell
+
+inputs:
+  content-id:
+    description: CodeSpell content identifier to associate with the submission.
+    required: true
+  language:
+    description: Submission language code expected by CodeSpell, for example JAVA.
+    required: true
+  user-id:
+    description: CodeSpell user identifier to associate with the submission.
+    required: true
+  auth-token:
+    description: CodeSpell API token or password for authentication.
+    required: true
+  api-url:
+    description: CodeSpell API base URL.
+    required: false
+    default: "https://api.codespell.dev"
+  source-path:
+    description: Path to the source files to include in the submission.
+    required: false
+    default: "."
+  exclude-paths:
+    description: Optional comma-separated list of file or directory prefixes to exclude.
+    required: false
+    default: ".git,.github,node_modules,dist,build,coverage,.next,.turbo"
+
+runs:
+  using: node20
+  main: src/index.js
+
+branding:
+  icon: upload
+  color: blue
