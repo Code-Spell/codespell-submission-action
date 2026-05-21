@@ -9,16 +9,24 @@ inputs:
   language:
     description: Submission language code expected by CodeSpell, for example JAVA.
     required: true
-  user-id:
-    description: CodeSpell user identifier to associate with the submission.
+  username:
+    description: CodeSpell username for authentication.
     required: true
-  auth-token:
-    description: CodeSpell API token or password for authentication.
+  password:
+    description: CodeSpell password for authentication.
     required: true
   api-url:
     description: CodeSpell API base URL.
     required: false
-    default: "https://api.codespell.dev"
+    default: "https://api-dev.codespell.net"
+  auth-url:
+    description: Optional authentication URL for the CodeSpell API, if different from the API base URL.
+    required: false
+    default: "https://auth-dev.codespell.net"
+  auth-realm:
+    description: Optional authentication realm for the CodeSpell API, if required.
+    required: false
+    default: "codespell-dev"
   source-path:
     description: Path to the source files to include in the submission.
     required: false
