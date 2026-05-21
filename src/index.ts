@@ -1,26 +1,39 @@
 import * as core from '@actions/core';
-import * as fs from 'fs';
+import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import { globSync } from 'glob';
+import { Buffer } from 'buffer';
 
-async function run() {
+interface CodeSource {
+    filename: string;
+    extension: string;
+    path: string;
+    code: string;
+}
+
+async function run(): Promise<void> {
     try {
         const contentId = core.getInput('content-id');
         const language = core.getInput('language');
         const userId = core.getInput('user-id');
         const authToken = core.getInput('auth-token');
         const apiUrl = core.getInput('api-url');
-        
-        const sourcePath = core.getInput('source-path');
-        const excludedPaths = core.getInput('exclude-paths').split(',').map(p => p.trim());
 
-        const files = glob.sync(`${sourcePath}/**/*.*`, {
+        const sourcePath = core.getInput('source-path');
+
+        const excludedPaths = core
+            .getInput('exclude-paths')
+            .split(',')
+            .map((p: string) => p.trim())
+            .filter(Boolean);
+
+        const files = globSync(`${sourcePath}/**/*.*`, {
             nodir: true,
-            ignore: excludedPaths.map(p => `${p}/**`)
+            ignore: excludedPaths.map((p: string) => `${p}/**`)
         });
 
-        const codeSources = files.map(file => {
+        const codeSources: CodeSource[] = files.map((file: string) => {
             const content = fs.readFileSync(file);
             const parsed = path.parse(file);
 
@@ -28,13 +41,14 @@ async function run() {
                 filename: parsed.name,
                 extension: parsed.ext.replace('.', ''),
                 path: parsed.dir,
-                code: btoa(content.toString('utf-8'))
+                code: Buffer.from(content.toString('utf-8')).toString('base64')
             };
         });
 
         const payload = {
             contentId,
             language,
+            userId,
             codeSources
         };
 
@@ -49,13 +63,18 @@ async function run() {
             }
         );
 
-        core.info(`Submission created successfully`);
+        core.info('Submission created successfully');
 
         if (response.data.id) {
             core.setOutput('submission-id', response.data.id);
         }
-    } catch (error) {
-        core.setFailed(error.message);
+
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            core.setFailed(error.message);
+        } else {
+            core.setFailed(String(error));
+        }
     }
 }
 

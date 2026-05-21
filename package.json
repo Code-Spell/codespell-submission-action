@@ -3,11 +3,9 @@
   "version": "0.1.0",
   "description": "GitHub Action that creates CodeSpell submissions from repository source files.",
   "private": true,
-  "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "build": "ncc build src/index.js -o dist",
-    "check": "node --check src/index.js"
+    "build": "tsup src/index.ts --format esm --target node20 --out-dir dist"
   },
   "engines": {
     "node": ">=20"
@@ -25,11 +23,13 @@
   "homepage": "https://github.com/Code-Spell/codespell-submission-action#readme",
   "dependencies": {
     "@actions/core": "^3.0.1",
-    "@actions/github": "^9.1.1",
     "axios": "^1.16.1",
     "glob": "^13.0.6"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.38.4"
+    "@types/node": "^25.9.1",
+    "@vercel/ncc": "^0.38.4",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
   }
 }
