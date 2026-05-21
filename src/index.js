@@ -1,8 +1,8 @@
-const core = require('@actions/core');
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const glob = require('glob');
+import * as core from '@actions/core';
+import * as fs from 'fs';
+import path from 'path';
+import axios from 'axios';
+import { globSync } from 'glob';
 
 async function run() {
     try {
