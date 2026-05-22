@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import fs from 'fs';
 import path from 'path';
+import axios from 'axios';
 import { globSync } from 'glob';
 import { Buffer } from 'buffer';
 
@@ -28,24 +29,10 @@ async function obtainAuthToken(): Promise<string> {
     params.append('client_id', 'frontend-dev');
 
     try {
-        const response = await fetch(`${authUrl}/realms/${authRealm}/protocol/openid-connect/token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: params
-        });
-
-        if (!response.ok) {
-            throw new Error(`Token request failed with status ${response.status}`);
-        }
-
-        const data = await response.json() as { access_token?: string };
-        if (!data.access_token) {
-            throw new Error('Authentication failed: missing access token in response.');
-        }
-
-        return data.access_token;
+        const response = await axios.post(`${authUrl}/realms/${authRealm}/protocol/openid-connect/token`,
+            params
+        );
+        return response.data.access_token;
     } catch (error: unknown) {
         if (error instanceof Error) {
             throw new Error(`Authentication failed: ${error.message}`);
@@ -77,7 +64,7 @@ export async function run(): Promise<void> {
             const content = fs.readFileSync(file);
             const parsed = path.parse(file);
             const code = Buffer.from(content.toString('utf-8')).toString('base64');
-
+            
             if (code.length > 65535) {
                 core.warning(`File ${file} exceeds the maximum allowed size of 65535 bytes and will be skipped.`);
                 return null;
@@ -97,21 +84,22 @@ export async function run(): Promise<void> {
             language,
             codeSources
         };
-
-        const response = await fetch(`${apiUrl}/submissions`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
+        
+        const response = await axios.post(
+            `${apiUrl}/submissions`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
 
         core.info('Submission created successfully');
 
-        const data = await response.json();
-        if (data.id) {
-            core.setOutput('submission-id', data.id);
+        if (response.data.id) {
+            core.setOutput('submission-id', response.data.id);
         }
 
     } catch (error: unknown) {

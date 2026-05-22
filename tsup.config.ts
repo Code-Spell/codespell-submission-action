@@ -1,16 +1,10 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['esm'],
-  target: 'node20',
-  outDir: 'dist',
-  clean: true,
-  bundle: true,
-  noExternal: [
-    '@actions/core',
-    '@actions/github',
-    'axios',
-    'glob'
-  ]
+    entry: ['src/index.ts'], // or wherever your entry point is
+    format: ['esm'],         // matching your .mjs output
+    minify: false,           // optional, easier to debug if false
+    sourcemap: true,
+    clean: true,
+    noExternal: [/.*/],
 });
