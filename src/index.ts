@@ -34,11 +34,15 @@ async function obtainAuthToken(): Promise<string> {
         );
         return response.data.access_token;
     } catch (error: unknown) {
-        if (error instanceof Error) {
-            throw new Error(`Authentication failed: ${error.message}`);
+        if (axios.isAxiosError(error)) {
+            const errData = error.response?.data ? JSON.stringify(error.response.data) : error.message;
+            core.setFailed(`Authentication failed: ${errData}`);
+        } else if (error instanceof Error) {
+            core.setFailed(`Authentication failed: ${error.message}`);
         } else {
-            throw new Error(`Authentication failed: ${String(error)}`);
+            core.setFailed(`Authentication failed: ${String(error)}`);
         }
+        throw error;
     }
 }
 
@@ -103,7 +107,10 @@ export async function run(): Promise<void> {
         }
 
     } catch (error: unknown) {
-        if (error instanceof Error) {
+        if (axios.isAxiosError(error)) {
+            const errData = error.response?.data ? JSON.stringify(error.response.data) : error.message;
+            core.setFailed(errData);
+        } else if (error instanceof Error) {
             core.setFailed(error.message);
         } else {
             core.setFailed(String(error));

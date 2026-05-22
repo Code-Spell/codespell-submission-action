@@ -38573,11 +38573,15 @@ async function obtainAuthToken() {
     );
     return response.data.access_token;
   } catch (error2) {
-    if (error2 instanceof Error) {
-      throw new Error(`Authentication failed: ${error2.message}`);
+    if (axios_default.isAxiosError(error2)) {
+      const errData = error2.response?.data ? JSON.stringify(error2.response.data) : error2.message;
+      setFailed(`Authentication failed: ${errData}`);
+    } else if (error2 instanceof Error) {
+      setFailed(`Authentication failed: ${error2.message}`);
     } else {
-      throw new Error(`Authentication failed: ${String(error2)}`);
+      setFailed(`Authentication failed: ${String(error2)}`);
     }
+    throw error2;
   }
 }
 async function run() {
@@ -38627,7 +38631,10 @@ async function run() {
       setOutput("submission-id", response.data.id);
     }
   } catch (error2) {
-    if (error2 instanceof Error) {
+    if (axios_default.isAxiosError(error2)) {
+      const errData = error2.response?.data ? JSON.stringify(error2.response.data) : error2.message;
+      setFailed(errData);
+    } else if (error2 instanceof Error) {
       setFailed(error2.message);
     } else {
       setFailed(String(error2));
