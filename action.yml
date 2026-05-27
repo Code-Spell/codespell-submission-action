@@ -18,15 +18,15 @@ inputs:
   api-url:
     description: CodeSpell API base URL.
     required: false
-    default: "https://api-dev.codespell.net"
+    default: "https://api.codespell.net"
   auth-url:
     description: Optional authentication URL for the CodeSpell API, if different from the API base URL.
     required: false
-    default: "https://auth-dev.codespell.net"
+    default: "https://auth.codespell.net"
   auth-realm:
     description: Optional authentication realm for the CodeSpell API, if required.
     required: false
-    default: "codespell-dev"
+    default: "codespell-prod"
   source-path:
     description: Path to the source files to include in the submission.
     required: false

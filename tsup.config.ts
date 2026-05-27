@@ -1,9 +1,9 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-    entry: ['src/index.ts'], // or wherever your entry point is
-    format: ['cjs'],         // matching your .mjs output
-    minify: false,           // optional, easier to debug if false
+    entry: ['src/index.ts'],
+    format: ['cjs'],
+    minify: false,
     sourcemap: true,
     clean: true,
     noExternal: [/.*/],

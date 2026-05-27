@@ -29,9 +29,7 @@ async function obtainAuthToken(): Promise<string> {
     params.append('client_id', 'frontend-dev');
 
     try {
-        const response = await axios.post(`${authUrl}/realms/${authRealm}/protocol/openid-connect/token`,
-            params
-        );
+        const response = await axios.post(`${authUrl}/realms/${authRealm}/protocol/openid-connect/token`,params);
         return response.data.access_token;
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
